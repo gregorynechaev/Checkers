@@ -28,9 +28,9 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     public void actionPerformed(ActionEvent evt) {
         Object src = evt.getSource();
         if (src == Checkers.play)
-            Checkers.label.setText("The game was started");
+            start();
         else if (src == Checkers.finish)
-            Checkers.label.setText("Your game was finished");
+            finish();
     }
 
     void start() {
@@ -38,6 +38,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             Checkers.label.setText("Firstly, finish your game!");
             return;
         }
+        available = board.getAvailableMoves(CheckersInfo.LIGHT);
         selectRow = -1;
         board.ready();
         current = CheckersInfo.LIGHT;
@@ -185,15 +186,18 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
         if (selectRow >= 0) {
             g.setColor(Color.white);
-            g.drawRect(4 + selectColumn*40, 4 + selectRow*40, 38, 38);
-            g.drawRect(6 + selectColumn*40, 6 + selectRow*40, 34, 34);
+            g.drawRect(4 + selectColumn * 40, 4 + selectRow * 40, 38, 38);
+            g.drawRect(6 + selectColumn * 40, 6 + selectRow * 40, 34, 34);
             g.setColor(Color.green);
-            for (int i = 0; i < available.length; i++) {
-                if (available[i].fromColumn == selectColumn && available[i].fromRow == selectRow) {
-                    g.drawRect(4 + available[i].toColumn*40, 4 + available[i].toRow*40, 38, 38);
-                    g.drawRect(6 + available[i].toColumn*40, 6 + available[i].toRow*40, 34, 34);
+            if (this.available != null) {
+                for (int i = 0; i < available.length; i++) {
+                    if (available[i].fromColumn == selectColumn && available[i].fromRow == selectRow) {
+                        g.drawRect(4 + available[i].toColumn * 40, 4 + available[i].toRow * 40, 38, 38);
+                        g.drawRect(6 + available[i].toColumn * 40, 6 + available[i].toRow * 40, 34, 34);
+                    }
                 }
             }
+
         }
 
 
