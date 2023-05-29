@@ -15,11 +15,14 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
 
     Board() {
-        addMouseListener(this);
         setBackground(Color.BLACK);
-        Checkers.play = new JButton("Start a game");
+        addMouseListener(this);
         Checkers.finish = new JButton("Finish a game");
+        Checkers.finish.addActionListener(this);
+        Checkers.play = new JButton("Start a game");
+        Checkers.play.addActionListener(this);
         Checkers.label = new JLabel("WELCOME!", JLabel.CENTER);
+        Checkers.label.setFont(new Font("Arial", Font.BOLD, 28));
         Checkers.label.setForeground(new Color(47, 79, 79));
         board = new CheckersInfo();
 
@@ -38,9 +41,11 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             Checkers.label.setText("Firstly, finish your game!");
             return;
         }
+        board.ready();
         available = board.getAvailableMoves(CheckersInfo.LIGHT);
         selectRow = -1;
-        board.ready();
+
+
         current = CheckersInfo.LIGHT;
         Checkers.label.setText("White - It's your turn!");
         gameOn = true;
@@ -52,22 +57,39 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     void finish() {
-        if (current == CheckersInfo.LIGHT) Checkers.label.setText("Game over. RED wins");
-        else Checkers.label.setText("Game over. WHITE wins");
+        if (current == CheckersInfo.LIGHT) {
+            Checkers.label.setText("Game over. RED wins");
+            Checkers.play.setEnabled(true);
+            Checkers.finish.setEnabled(false);
+            gameOn = false;
+        } else {
+            Checkers.label.setText("Game over. WHITE wins");
+            Checkers.play.setEnabled(true);
+            Checkers.finish.setEnabled(false);
+            gameOn = false;
+        }
     }
 
 
     void cellClick(int row, int column) {
+
         for (int i = 0; i < available.length; i++) {
             if (available[i].fromRow == row && available[i].fromColumn == column) {
-                selectColumn = column;
                 selectRow = row;
+                selectColumn = column;
                 if (current == CheckersInfo.LIGHT) Checkers.label.setText("WHITE, it's your turn");
                 else Checkers.label.setText("RED, it's your turn");
                 repaint();
                 return;
             }
+
         }
+
+        if (selectRow < 0) {
+            Checkers.label.setText("Click where you want to go");
+            return;
+        }
+
 
         for (int i = 0; i < available.length; i++)
             if (available[i].fromRow == selectRow && available[i].fromColumn == selectColumn
@@ -83,15 +105,41 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         board.makeMove(move);
 
 
+        if (move.jump()) {
+            available = board.getAvailableJumps(current, move.toRow, move.toColumn);
+            if (available != null) {
+                if (current == CheckersInfo.LIGHT)
+                    Checkers.label.setText("WHITE, you've to continue jumping!");
+                else
+                    Checkers.label.setText("RED, you've to continue jumping!");
+                selectRow = move.toRow;
+                selectColumn = move.toColumn;
+                repaint();
+                return;
+            }
+        }
+
+
         if (current == CheckersInfo.LIGHT) {
             current = CheckersInfo.DARK;
             available = board.getAvailableMoves(current);
-            if (available == null) Checkers.label.setText("WHITE wins!");
+            if (available == null) {
+                Checkers.label.setText("WHITE wins!");
+                Checkers.play.setEnabled(true);
+                Checkers.finish.setEnabled(false);
+                gameOn = false;
+            } else if (available[0].jump()) Checkers.label.setText("RED, you must jump!");
             else Checkers.label.setText("RED, it's your turn!");
+
         } else {
             current = CheckersInfo.LIGHT;
             available = board.getAvailableMoves(current);
-            if (available == null) Checkers.label.setText("RED wins!");
+            if (available == null) {
+                Checkers.label.setText("RED wins!");
+                Checkers.play.setEnabled(true);
+                Checkers.finish.setEnabled(false);
+                gameOn = false;
+            } else if (available[0].jump()) Checkers.label.setText("WHITE, you must jump!");
             else Checkers.label.setText("WHITE, it's your turn!");
         }
 
@@ -115,90 +163,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     }
 
 
-    public void mousePressed(MouseEvent evt) {
-        if (gameOn == false)
-            Checkers.label.setText("Press \"Start a game\"");
-        else {
-            int column = (evt.getX() - 4) / 40;
-            int row = (evt.getY() - 4) / 40;
-            if (column >= 0 && column < 8 && row >= 0 && row < 16)
-                cellClick(row, column);
-        }
-    }
-
-    public void mouseReleased(MouseEvent evt) {
-    }
-
-    public void mouseClicked(MouseEvent evt) {
-    }
-
-    public void mouseEntered(MouseEvent evt) {
-    }
-
-    public void mouseExited(MouseEvent evt) {
-    }
-
-
     public void paintComponent(Graphics g) {
-
-
-        for (int row = 0; row < 8; row++) {
-            for (int column = 0; column < 8; column++) {
-                if (row % 2 == column % 2)
-                    g.setColor(new Color(210, 180, 140));
-                else
-                    g.setColor(new Color(139, 69, 19));
-                g.fillRect(4 + column * 40, 4 + row * 40, 40, 40);
-
-                switch (board.pieceAt(row, column)) {
-                    case CheckersInfo.LIGHT:
-                        g.setColor(Color.WHITE);
-                        g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
-                        break;
-                    case CheckersInfo.DARK:
-                        g.setColor(new Color(128, 0, 0));
-                        g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
-                        break;
-                    case CheckersInfo.LIGHT_QUEEN:
-                        g.setColor(Color.WHITE);
-                        g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
-                        g.setColor(Color.WHITE);
-                        g.drawString("K", 14 + column * 40, 32 + row * 40);
-                        break;
-                    case CheckersInfo.DARK_QUEEN:
-                        g.setColor(Color.BLACK);
-                        g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
-                        g.setColor(Color.WHITE);
-                        g.drawString("K", 14 + column * 40, 32 + row * 40);
-                        break;
-                }
-            }
-        }
-
-        if (gameOn) {
-            g.setColor(Color.cyan);
-            for (int i = 0; i < available.length; i++) {
-                g.drawRect(4 + available[i].fromColumn * 40, 4 + available[i].fromRow * 40, 38, 38);
-                g.drawRect(6 + available[i].fromColumn * 40, 6 + available[i].fromRow * 40, 34, 34);
-            }
-        }
-
-
-        if (selectRow >= 0) {
-            g.setColor(Color.white);
-            g.drawRect(4 + selectColumn * 40, 4 + selectRow * 40, 38, 38);
-            g.drawRect(6 + selectColumn * 40, 6 + selectRow * 40, 34, 34);
-            g.setColor(Color.green);
-            if (this.available != null) {
-                for (int i = 0; i < available.length; i++) {
-                    if (available[i].fromColumn == selectColumn && available[i].fromRow == selectRow) {
-                        g.drawRect(4 + available[i].toColumn * 40, 4 + available[i].toRow * 40, 38, 38);
-                        g.drawRect(6 + available[i].toColumn * 40, 6 + available[i].toRow * 40, 34, 34);
-                    }
-                }
-            }
-
-        }
 
 
         g.setColor(Color.black);
@@ -213,7 +178,88 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
                 getSize().height - 3);
 
+        for (int row = 0; row < 8; row++) {
+            for (int column = 0; column < 8; column++) {
+                if (row % 2 == column % 2)
+                    g.setColor(new Color(210, 180, 140));
+                else
+                    g.setColor(new Color(139, 69, 19));
+                g.fillRect(4 + column * 40, 4 + row * 40, 40, 40);
 
+                switch (board.pieceAt(row, column)) {
+                    case CheckersInfo.LIGHT:
+                        g.setColor(Color.WHITE);
+                        g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
+
+                        break;
+                    case CheckersInfo.DARK:
+                        g.setColor(new Color(128, 0, 0));
+                        g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
+                        break;
+                    case CheckersInfo.LIGHT_QUEEN:
+                        g.setColor(Color.WHITE);
+                        g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
+                        g.setColor(new Color(128, 0, 0));
+                        g.drawString("K", 19 + column * 40, 28 + row * 40);
+                        break;
+                    case CheckersInfo.DARK_QUEEN:
+                        g.setColor(new Color(128, 0, 0));
+                        g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
+                        g.setColor(Color.WHITE);
+                        g.drawString("K", 19 + column * 40, 28 + row * 40);
+                        break;
+                }
+            }
+        }
+
+        if (gameOn) {
+
+            g.setColor(new Color(106, 90, 205));
+
+            for (int i = 0; i < available.length; i++) {
+
+                g.drawRect(4 + available[i].fromColumn * 40, 4 + available[i].fromRow * 40, 38, 38);
+                g.drawRect(6 + available[i].fromColumn * 40, 6 + available[i].fromRow * 40, 34, 34);
+            }
+
+
+            if (selectRow >= 0) {
+                g.setColor(Color.white);
+                g.drawRect(4 + selectColumn * 40, 4 + selectRow * 40, 38, 38);
+                g.drawRect(6 + selectColumn * 40, 6 + selectRow * 40, 34, 34);
+                g.setColor(new Color(0, 250, 154));
+
+                for (int i = 0; i < available.length; i++) {
+                    if (available[i].fromColumn == selectColumn && available[i].fromRow == selectRow) {
+                        g.drawRect(4 + available[i].toColumn * 40, 4 + available[i].toRow * 40, 38, 38);
+                        g.drawRect(6 + available[i].toColumn * 40, 6 + available[i].toRow * 40, 34, 34);
+                    }
+                }
+            }
+        }
+    }
+
+    public void mousePressed(MouseEvent evt) {
+        if (gameOn == false)
+            Checkers.label.setText("Press \"Start a game\"");
+        else {
+            int column = (evt.getX() - 4) / 40;
+            int row = (evt.getY() - 4) / 40;
+            if (column >= 0 && column < 8 && row >= 0 && row < 8)
+                cellClick(row, column);
+        }
+    }
+
+    public void mouseReleased(MouseEvent evt) {
+    }
+
+    public void mouseClicked(MouseEvent evt) {
+    }
+
+    public void mouseEntered(MouseEvent evt) {
+    }
+
+    public void mouseExited(MouseEvent evt) {
     }
 
 }

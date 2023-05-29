@@ -25,7 +25,7 @@ public class Checkers extends JPanel {
 
     public Checkers() {
         setLayout(null);
-        setPreferredSize(new Dimension(700, 420));
+        setPreferredSize(new Dimension(700, 500));
         setBackground(new Color(222, 184, 135));
 
 
@@ -34,11 +34,10 @@ public class Checkers extends JPanel {
         add(play);
         add(finish);
         add(label);
-
         board.setBounds(40, 40, 328, 328);
-        play.setBounds(400, 40, 280, 30);
-        finish.setBounds(400, 100, 280, 30);
-        label.setBounds(400, 200, 280, 200);
+        play.setBounds(420, 120, 240, 60);
+        finish.setBounds(420, 240, 240, 60);
+        label.setBounds(150, 404, 400, 40);
 
     }
 
