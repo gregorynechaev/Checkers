@@ -77,8 +77,8 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             if (available[i].fromRow == row && available[i].fromColumn == column) {
                 selectRow = row;
                 selectColumn = column;
-                if (current == CheckersInfo.LIGHT) Checkers.label.setText("WHITE, it's your turn");
-                else Checkers.label.setText("RED, it's your turn");
+                if (current == CheckersInfo.LIGHT) Checkers.label.setText("WHITE, it's your turn!");
+                else Checkers.label.setText("RED, it's your turn!");
                 repaint();
                 return;
             }
@@ -86,7 +86,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         if (selectRow < 0) {
-            Checkers.label.setText("Click where you want to go");
+            Checkers.label.setText("Click on the checker you want to move");
             return;
         }
 
@@ -190,7 +190,6 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                     case CheckersInfo.LIGHT:
                         g.setColor(Color.WHITE);
                         g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
-
                         break;
                     case CheckersInfo.DARK:
                         g.setColor(new Color(128, 0, 0));
@@ -200,13 +199,13 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                         g.setColor(Color.WHITE);
                         g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
                         g.setColor(new Color(128, 0, 0));
-                        g.drawString("K", 19 + column * 40, 28 + row * 40);
+                        g.drawString("Q", 19 + column * 40, 28 + row * 40);
                         break;
                     case CheckersInfo.DARK_QUEEN:
                         g.setColor(new Color(128, 0, 0));
                         g.fillOval(8 + column * 40, 8 + row * 40, 30, 30);
                         g.setColor(Color.WHITE);
-                        g.drawString("K", 19 + column * 40, 28 + row * 40);
+                        g.drawString("Q", 19 + column * 40, 28 + row * 40);
                         break;
                 }
             }

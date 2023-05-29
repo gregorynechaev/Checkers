@@ -37,7 +37,7 @@ public class Checkers extends JPanel {
         board.setBounds(40, 40, 328, 328);
         play.setBounds(420, 120, 240, 60);
         finish.setBounds(420, 240, 240, 60);
-        label.setBounds(150, 404, 400, 40);
+        label.setBounds(50, 404, 600, 40);
 
     }
 
