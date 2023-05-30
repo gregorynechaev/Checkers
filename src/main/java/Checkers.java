@@ -23,6 +23,7 @@ public class Checkers extends JPanel {
     public static JLabel label;
 
 
+
     public Checkers() {
         setLayout(null);
         setPreferredSize(new Dimension(700, 500));

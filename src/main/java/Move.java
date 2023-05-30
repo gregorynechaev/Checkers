@@ -1,8 +1,6 @@
 public class Move {
-    int fromRow;
-    int fromColumn;
-    int toRow;
-    int toColumn;
+    int fromRow, fromColumn, toRow, toColumn;
+
 
     Move(int r1, int c1, int r2, int c2) {
         fromRow = r1;
